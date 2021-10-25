@@ -1,6 +1,7 @@
 // sets up dependencies
 const Alexa = require('ask-sdk-core');
 const i18n = require('i18next');
+const { get } = require('request');
 //const functionWrapper = null;
 
 let request = require('request');
@@ -13,6 +14,7 @@ let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiK
 const GetNewFactHandler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
+    get(GetNewCityItemsHandler);
     // checks request type
     return request.type === 'LaunchRequest'
       || (request.type === 'IntentRequest'
@@ -80,7 +82,7 @@ const GetNewFactHandler = {
   },
 };
 
-const GetNewItemHandler = {
+const GetNewCityItemsHandler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     // checks request type
@@ -106,6 +108,76 @@ const GetNewItemHandler = {
       // Uncomment the next line if you want to keep the session open so you can
       // ask for another fact without first re-opening the skill
       // .reprompt(requestAttributes.t('HELP_REPROMPT'))
+      .withSimpleCard(requestAttributes.t('SKILL_NAME'), randomFact)
+      .getResponse();
+  },
+};
+
+const GetNewFactHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    // checks request type
+    return request.type === 'LaunchRequest'
+      || (request.type === 'IntentRequest'
+        && request.intent.name === 'GetNewFactIntent');
+  },
+  handle(handlerInput) {
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    // gets a random fact by assigning an array to the variable
+    // the random item from the array will be selected by the i18next library
+    // the i18next library is set up in the Request Interceptor
+    const sort_by = (field, reverse, primer) => {
+
+      const key = primer ?
+        function(x) {
+          return primer(x[field])
+        } :
+        function(x) {
+          return x[field]
+        };
+    
+      reverse = !reverse ? 1 : -1;
+    
+      return function(a, b) {
+        return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+      }
+    }
+    
+    
+    //Now you can sort by any field at will...
+    
+    const homes=[{h_id:"3",city:"Dallas",state:"TX",zip:"75201",price:"162500"},{h_id:"4",city:"Bevery Hills",state:"CA",zip:"90210",price:"319250"},{h_id:"5",city:"New York",state:"NY",zip:"00010",price:"962500"}];
+    
+    // Sort by price high to low
+    console.log(homes.sort(sort_by('price', true, parseInt)));
+    
+    // Sort by city, case-insensitive, A-Z
+    console.log(homes.sort(sort_by('city', false, (a) =>  a.toUpperCase()
+    )));
+    var options = {
+      host: url,
+      port: 80,
+      path: '/resource?id=foo&bar=baz',
+      method: 'POST'
+    };
+    
+    http.request(options, function(res) {
+      console.log('STATUS: ' + res.statusCode);
+      console.log('HEADERS: ' + JSON.stringify(res.headers));
+      res.setEncoding('utf8');
+      res.on('data', function (chunk) {
+        console.log('BODY: ' + chunk);
+      });
+    }).end();
+    const randomFact = requestAttributes.t('FACTS');
+    // concatenates a standard message with the random fact
+    const speakOutput = requestAttributes.t('GET_FACT_MESSAGE') + randomFact;
+
+    return handlerInput.responseBuilder
+      .speak(speakOutput)
+      // Uncomment the next line if you want to keep the session open so you can
+      // ask for another fact without first re-opening the skill
+      .reprompt(requestAttributes.t('HELP_REPROMPT'))
       .withSimpleCard(requestAttributes.t('SKILL_NAME'), randomFact)
       .getResponse();
   },
