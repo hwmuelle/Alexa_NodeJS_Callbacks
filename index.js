@@ -217,6 +217,7 @@ const GetAPICALLBACK = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     // checks request type
+    PostAPICALLBACK();
     return request.type === 'LaunchRequest'
       || (request.type === 'IntentRequest'
         && request.intent.name === 'GetAPIIntent');
@@ -233,14 +234,14 @@ const GetAPICALLBACK = {
   },
 };
 
-const ALLinONECall = {
-  var request = require('request');
-  request('http://www.google.com', function (error, response, body) {
-      if (!error && response.statusCode == 200) {
-          console.log(body) // Print the google web page.
-       }
-  })
-};
+// const ALLinONECall = {
+//   var request = require('request');
+//   request('http://www.google.com', function (error, response, body) {
+//       if (!error && response.statusCode == 200) {
+//           console.log(body) // Print the google web page.
+//        }
+//   })
+// };
 
 
 
