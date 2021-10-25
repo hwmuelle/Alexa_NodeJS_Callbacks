@@ -1,7 +1,7 @@
 // sets up dependencies
 const Alexa = require('ask-sdk-core');
 const i18n = require('i18next');
-const functionWrapper = null;
+//const functionWrapper = null;
 
 let request = require('request');
 
@@ -74,7 +74,7 @@ const GetNewFactHandler = {
       .speak(speakOutput)
       // Uncomment the next line if you want to keep the session open so you can
       // ask for another fact without first re-opening the skill
-      // .reprompt(requestAttributes.t('HELP_REPROMPT'))
+      .reprompt(requestAttributes.t('HELP_REPROMPT'))
       .withSimpleCard(requestAttributes.t('SKILL_NAME'), randomFact)
       .getResponse();
   },
